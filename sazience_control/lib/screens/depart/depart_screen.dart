@@ -1,7 +1,6 @@
 // lib/screens/depart/depart_screen.dart
 import 'package:flutter/material.dart';
 import 'package:camera/camera.dart';
-import 'package:intl/intl.dart';
 import 'dart:async';
 import 'dart:developer';
 import 'package:sazience_control/screens/depart/camera_scanner_screen.dart';
@@ -326,24 +325,6 @@ class _DepartScreenState extends State<DepartScreen> {
                     },
                   ),
                   const SizedBox(height: 10),
-                  // Date et Heure auto, non modifiables
-                  Text(
-                    "Date: ${DateFormat('dd/MM/yyyy').format(_currentDateTime)}",
-                    style: const TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                      color: Color(0xFF191919),
-                    ),
-                  ),
-                  const SizedBox(height: 5),
-                  Text(
-                    "Heure: ${DateFormat('HH:mm').format(_currentDateTime)}",
-                    style: const TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                      color: Color(0xFF191919),
-                    ),
-                  ),
                   const SizedBox(height: 24),
                   ElevatedButton.icon(
                     onPressed: _submitDepart,

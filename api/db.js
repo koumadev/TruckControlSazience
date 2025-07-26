@@ -24,18 +24,22 @@ async function initDB() {
 
   // Création table si elle n'existe pas
   await db.query(`
-    CREATE TABLE IF NOT EXISTS depart (
-      id INT AUTO_INCREMENT PRIMARY KEY,
-      immatriculation VARCHAR(20) NOT NULL,
-      conducteur VARCHAR(50) NOT NULL,
-      site_destination VARCHAR(50),
-      type_chargement VARCHAR(50),
-      quantite INT,
-      date_heure DATETIME
-    )
-  `);
+  CREATE TABLE IF NOT EXISTS departs (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    immatriculation VARCHAR(20) NOT NULL,
+    conducteur VARCHAR(50) NOT NULL,
+    site_destination VARCHAR(50),
+    type_chargement VARCHAR(50),
+    quantite_depart INT,
+    quantite_arrivee INT DEFAULT NULL,
+    date_depart DATE NOT NULL,
+    heure_depart TIME NOT NULL,
+    date_arrivee DATE DEFAULT NULL,
+    heure_arrivee TIME DEFAULT NULL
+  )
+`);
 
-  console.log('Table "depart" prête.');
+  console.log('Table "departs" prête.');
   return db;
 }
 
