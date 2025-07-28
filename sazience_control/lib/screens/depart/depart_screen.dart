@@ -1,9 +1,8 @@
-// lib/screens/depart/depart_screen.dart
 import 'package:flutter/material.dart';
 import 'package:camera/camera.dart';
 import 'dart:async';
-import 'dart:developer';
 import 'package:sazience_control/screens/depart/camera_scanner_screen.dart';
+import 'package:sazience_control/services/api_service.dart';
 
 final List<String> sites = ['Usine A', 'Usine B', 'Usine C'];
 final List<String> typesChargement = ['Farine', 'Matière Première', 'Vide'];
@@ -20,6 +19,7 @@ class DepartScreen extends StatefulWidget {
 class _DepartScreenState extends State<DepartScreen> {
   final TextEditingController _immatriculationController =
       TextEditingController();
+  final TextEditingController _conducteurController = TextEditingController();
   final TextEditingController _sacsDepartController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
 
@@ -33,17 +33,19 @@ class _DepartScreenState extends State<DepartScreen> {
   void initState() {
     super.initState();
     _currentDateTime = DateTime.now();
-    // Mise à jour toutes les secondes
     _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
-      setState(() {
-        _currentDateTime = DateTime.now();
-      });
+      if (mounted) {
+        setState(() {
+          _currentDateTime = DateTime.now();
+        });
+      }
     });
   }
 
   @override
   void dispose() {
     _immatriculationController.dispose();
+    _conducteurController.dispose();
     _sacsDepartController.dispose();
     _timer?.cancel();
     super.dispose();
@@ -57,15 +59,15 @@ class _DepartScreenState extends State<DepartScreen> {
       ),
     );
 
-    if (!mounted) return; // <-- correction pour éviter l'erreur
+    if (!mounted) return;
 
     if (result != null && result.isNotEmpty) {
       setState(() {
         _immatriculationController.text = result;
       });
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Plaque d\'immatriculation détectée: $result')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Plaque détectée: $result')));
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Aucune plaque détectée ou scan annulé.')),
@@ -73,38 +75,42 @@ class _DepartScreenState extends State<DepartScreen> {
     }
   }
 
-  void _submitDepart() {
+  Future<void> _submitDepart() async {
     if (_formKey.currentState!.validate()) {
-      if (_immatriculationController.text.isEmpty) {
+      final success = await ApiService.sendDepart(
+        immatriculation: _immatriculationController.text,
+        conducteur: _conducteurController.text,
+        siteDestination: _selectedSiteDestination,
+        typeChargement: _selectedTypeChargement,
+        quantiteDepart: int.parse(_sacsDepartController.text),
+        dateDepart: _currentDateTime,
+        heureDepart: _currentDateTime,
+      );
+
+      if (!mounted) return;
+
+      if (success) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text(
-              'Veuillez scanner ou saisir le numéro d\'immatriculation.',
-            ),
-          ),
+          const SnackBar(content: Text('Départ enregistré avec succès !')),
         );
-        return;
+        Navigator.pop(context);
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Erreur lors de l\'enregistrement.')),
+        );
       }
-
-      log('--- Données de Départ à envoyer à l\'API ---');
-      log('Immatriculation: ${_immatriculationController.text}');
-      log('Site Destination: ${_selectedSiteDestination ?? 'Non sélectionné'}');
-      log(
-        'Type de Chargement: ${_selectedTypeChargement ?? 'Non sélectionné'}',
-      );
-      log('Nombre de Sacs: ${_sacsDepartController.text}');
-      log('Date/Heure Départ: $_currentDateTime');
-
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Départ enregistré (simulation) !')),
-      );
-
-      Navigator.pop(context);
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    const orange = Color(0xFFec4400);
+    OutlineInputBorder border = const OutlineInputBorder(
+      borderSide: BorderSide(color: Colors.white),
+    );
+    OutlineInputBorder focusedBorder = const OutlineInputBorder(
+      borderSide: BorderSide(color: orange, width: 2),
+    );
     return Scaffold(
       appBar: AppBar(title: const Text('Enregistrer un Départ')),
       backgroundColor: const Color(0xFFE8E5DE),
@@ -133,28 +139,15 @@ class _DepartScreenState extends State<DepartScreen> {
                     ),
                   ),
                   const SizedBox(height: 24),
-                  // Champ Immatriculation
                   TextFormField(
                     controller: _immatriculationController,
-                    decoration: const InputDecoration(
+                    decoration: InputDecoration(
                       labelText: 'Numéro d\'Immatriculation',
-                      border: OutlineInputBorder(),
-                      prefixIcon: Icon(Icons.local_shipping, size: 18),
-                      isDense: true,
-                      contentPadding: EdgeInsets.symmetric(
-                        vertical: 10,
-                        horizontal: 12,
-                      ),
-                      fillColor: Colors.white,
+                      border: border,
+                      focusedBorder: focusedBorder,
+                      labelStyle: const TextStyle(color: orange),
                       filled: true,
-                      focusedBorder: OutlineInputBorder(
-                        borderSide: BorderSide(
-                          color: Color(0xFFec4400),
-                          width: 2,
-                        ),
-                      ),
-                      labelStyle: TextStyle(color: Color(0xFF191919)),
-                      floatingLabelStyle: TextStyle(color: Color(0xFFec4400)),
+                      fillColor: Colors.white,
                     ),
                     style: const TextStyle(fontSize: 14),
                     validator: (value) {
@@ -165,27 +158,15 @@ class _DepartScreenState extends State<DepartScreen> {
                     },
                   ),
                   const SizedBox(height: 10),
-                  // Champ Conducteur
                   TextFormField(
-                    decoration: const InputDecoration(
+                    controller: _conducteurController,
+                    decoration: InputDecoration(
                       labelText: 'Nom du Conducteur',
-                      border: OutlineInputBorder(),
-                      prefixIcon: Icon(Icons.account_circle, size: 18),
-                      isDense: true,
-                      contentPadding: EdgeInsets.symmetric(
-                        vertical: 10,
-                        horizontal: 12,
-                      ),
-                      fillColor: Colors.white,
+                      border: border,
+                      focusedBorder: focusedBorder,
+                      labelStyle: const TextStyle(color: orange),
                       filled: true,
-                      focusedBorder: OutlineInputBorder(
-                        borderSide: BorderSide(
-                          color: Color(0xFFec4400),
-                          width: 2,
-                        ),
-                      ),
-                      labelStyle: TextStyle(color: Color(0xFF191919)),
-                      floatingLabelStyle: TextStyle(color: Color(0xFFec4400)),
+                      fillColor: Colors.white,
                     ),
                     style: const TextStyle(fontSize: 14),
                     validator: (value) {
@@ -196,123 +177,62 @@ class _DepartScreenState extends State<DepartScreen> {
                     },
                   ),
                   const SizedBox(height: 10),
-                  // Champ Site Destination
                   DropdownButtonFormField<String>(
-                    decoration: const InputDecoration(
-                      labelText: 'Site de Destination',
-                      border: OutlineInputBorder(),
-                      prefixIcon: Icon(Icons.factory, size: 18),
-                      isDense: true,
-                      contentPadding: EdgeInsets.symmetric(
-                        vertical: 10,
-                        horizontal: 12,
-                      ),
-                      fillColor: Colors.white,
-                      filled: true,
-                      focusedBorder: OutlineInputBorder(
-                        borderSide: BorderSide(
-                          color: Color(0xFFec4400),
-                          width: 2,
-                        ),
-                      ),
-                      labelStyle: TextStyle(color: Color(0xFF191919)),
-                      floatingLabelStyle: TextStyle(color: Color(0xFFec4400)),
-                    ),
                     value: _selectedSiteDestination,
-                    hint: const Text(
-                      'Sélectionner le site de destination',
-                      style: TextStyle(fontSize: 14),
+                    decoration: InputDecoration(
+                      labelText: 'Site de Destination',
+                      border: border,
+                      focusedBorder: focusedBorder,
+                      labelStyle: const TextStyle(color: orange),
+                      filled: true,
+                      fillColor: Colors.white,
                     ),
-                    items: sites.map((String site) {
-                      return DropdownMenuItem<String>(
+                    items: sites.map((site) {
+                      return DropdownMenuItem(
                         value: site,
                         child: Text(site, style: const TextStyle(fontSize: 14)),
                       );
                     }).toList(),
-                    onChanged: (String? newValue) {
-                      setState(() {
-                        _selectedSiteDestination = newValue;
-                      });
-                    },
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Veuillez sélectionner un site de destination';
-                      }
-                      return null;
-                    },
+                    onChanged: (value) =>
+                        setState(() => _selectedSiteDestination = value),
+                    validator: (value) =>
+                        value == null ? 'Veuillez sélectionner un site' : null,
                   ),
                   const SizedBox(height: 10),
-                  // Champ Nature Chargement
                   DropdownButtonFormField<String>(
-                    decoration: const InputDecoration(
-                      labelText: 'Nature du Chargement',
-                      border: OutlineInputBorder(),
-                      prefixIcon: Icon(Icons.archive, size: 18),
-                      isDense: true,
-                      contentPadding: EdgeInsets.symmetric(
-                        vertical: 10,
-                        horizontal: 12,
-                      ),
-                      fillColor: Colors.white,
-                      filled: true,
-                      focusedBorder: OutlineInputBorder(
-                        borderSide: BorderSide(
-                          color: Color(0xFFec4400),
-                          width: 2,
-                        ),
-                      ),
-                      labelStyle: TextStyle(color: Color(0xFF191919)),
-                      floatingLabelStyle: TextStyle(color: Color(0xFFec4400)),
-                    ),
                     value: _selectedTypeChargement,
-                    hint: const Text(
-                      'Sélectionner le type de chargement',
-                      style: TextStyle(fontSize: 14),
+                    decoration: InputDecoration(
+                      labelText: 'Nature du Chargement',
+                      border: border,
+                      focusedBorder: focusedBorder,
+                      labelStyle: const TextStyle(color: orange),
+                      filled: true,
+                      fillColor: Colors.white,
                     ),
-                    items: typesChargement.map((String type) {
-                      return DropdownMenuItem<String>(
+                    items: typesChargement.map((type) {
+                      return DropdownMenuItem(
                         value: type,
                         child: Text(type, style: const TextStyle(fontSize: 14)),
                       );
                     }).toList(),
-                    onChanged: (String? newValue) {
-                      setState(() {
-                        _selectedTypeChargement = newValue;
-                      });
-                    },
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Veuillez sélectionner le type de chargement';
-                      }
-                      return null;
-                    },
+                    onChanged: (value) =>
+                        setState(() => _selectedTypeChargement = value),
+                    validator: (value) =>
+                        value == null ? 'Veuillez sélectionner un type' : null,
                   ),
                   const SizedBox(height: 10),
-                  // Champ Quantité
                   TextFormField(
                     controller: _sacsDepartController,
-                    decoration: const InputDecoration(
+                    keyboardType: TextInputType.number,
+                    decoration: InputDecoration(
                       labelText: 'Quantité',
-                      border: OutlineInputBorder(),
-                      prefixIcon: Icon(Icons.inventory_2, size: 18),
-                      isDense: true,
-                      contentPadding: EdgeInsets.symmetric(
-                        vertical: 10,
-                        horizontal: 12,
-                      ),
-                      fillColor: Colors.white,
+                      border: border,
+                      focusedBorder: focusedBorder,
+                      labelStyle: const TextStyle(color: orange),
                       filled: true,
-                      focusedBorder: OutlineInputBorder(
-                        borderSide: BorderSide(
-                          color: Color(0xFFec4400),
-                          width: 2,
-                        ),
-                      ),
-                      labelStyle: TextStyle(color: Color(0xFF191919)),
-                      floatingLabelStyle: TextStyle(color: Color(0xFFec4400)),
+                      fillColor: Colors.white,
                     ),
                     style: const TextStyle(fontSize: 14),
-                    keyboardType: TextInputType.number,
                     validator: (value) {
                       if (value == null || value.isEmpty) {
                         return 'Veuillez entrer la quantité';
@@ -324,7 +244,6 @@ class _DepartScreenState extends State<DepartScreen> {
                       return null;
                     },
                   ),
-                  const SizedBox(height: 10),
                   const SizedBox(height: 24),
                   ElevatedButton.icon(
                     onPressed: _submitDepart,
