@@ -22,7 +22,7 @@ class ApiService {
   }) async {
     try {
       final response = await http.post(
-        Uri.parse('$baseUrl/depart'),
+        Uri.parse('$baseUrl/departs'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'immatriculation': immatriculation,

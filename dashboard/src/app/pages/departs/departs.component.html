@@ -1,0 +1,28 @@
+<div *ngIf="isLoading">Chargement des départs en cours...</div>
+
+<table *ngIf="!isLoading && departs.length > 0" class="table">
+  <thead>
+    <tr>
+      <th>Immatriculation</th>
+      <th>Conducteur</th>
+      <th>Site Destination</th>
+      <th>Type Chargement</th>
+      <th>Quantité Départ</th>
+      <th>Date Départ</th>
+      <th>Heure Départ</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr *ngFor="let depart of departs">
+      <td>{{ depart.immatriculation }}</td>
+      <td>{{ depart.conducteur }}</td>
+      <td>{{ depart.site_destination }}</td>
+      <td>{{ depart.type_chargement }}</td>
+      <td>{{ depart.quantite_depart }}</td>
+      <td>{{ depart.date_depart }}</td>
+      <td>{{ depart.heure_depart }}</td>
+    </tr>
+  </tbody>
+</table>
+
+<div *ngIf="!isLoading && departs.length === 0">Aucun départ en cours.</div>

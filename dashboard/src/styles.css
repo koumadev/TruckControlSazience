@@ -1,0 +1,11 @@
+/* You can add global styles to this file, and also import other style files */
+/* Global resets */
+* {
+  box-sizing: border-box;
+}
+body {
+  margin: 0;
+  background-color: #e8e5de;
+  font-family: "Nunito", sans-serif;
+  color: #191919;
+}

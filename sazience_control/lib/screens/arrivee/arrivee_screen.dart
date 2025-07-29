@@ -84,7 +84,14 @@ class _ArriveeScreenState extends State<ArriveeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Enregistrer une Arrivée')),
+      appBar: AppBar(
+        backgroundColor: const Color(0xFFE8E5DE),
+        centerTitle: true,
+        title: SizedBox(
+          height: 150,
+          child: Image.asset('assets/images/CargoC.png', fit: BoxFit.contain),
+        ),
+      ),
       backgroundColor: const Color(0xFFE8E5DE),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),

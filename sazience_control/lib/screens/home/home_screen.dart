@@ -15,8 +15,12 @@ class HomeScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: const Color(0xFFE8E5DE), // Couleur de fond personnalisée
       appBar: AppBar(
-        title: const Text('Gestion des Mouvements de Camions'),
+        backgroundColor: const Color(0xFFE8E5DE),
         centerTitle: true,
+        title: SizedBox(
+          height: 150,
+          child: Image.asset('assets/images/CargoC.png', fit: BoxFit.contain),
+        ),
       ),
       body: Center(
         child: Column(

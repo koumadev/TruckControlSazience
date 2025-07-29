@@ -112,7 +112,14 @@ class _DepartScreenState extends State<DepartScreen> {
       borderSide: BorderSide(color: orange, width: 2),
     );
     return Scaffold(
-      appBar: AppBar(title: const Text('Enregistrer un Départ')),
+      appBar: AppBar(
+        backgroundColor: const Color(0xFFE8E5DE),
+        centerTitle: true,
+        title: SizedBox(
+          height: 150,
+          child: Image.asset('assets/images/CargoC.png', fit: BoxFit.contain),
+        ),
+      ),
       backgroundColor: const Color(0xFFE8E5DE),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),

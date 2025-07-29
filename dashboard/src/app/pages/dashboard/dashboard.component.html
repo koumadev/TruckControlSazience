@@ -1,0 +1,69 @@
+<div class="dashboard-container">
+  <h1>Tableau des Départs</h1>
+
+  <input
+    type="text"
+    [(ngModel)]="searchQuery"
+    (input)="search()"
+    placeholder="Rechercher..."
+    class="search-box"
+  />
+
+  <div style="height: 24px"></div>
+
+  <div *ngIf="isLoading">Chargement des données...</div>
+
+  <div class="table-container">
+    <div class="table-responsive">
+      <table
+        *ngIf="!isLoading && filteredDeparts.length > 0"
+        class="data-table"
+      >
+        <thead>
+          <tr>
+            <th (click)="sort('id')">ID</th>
+            <th (click)="sort('immatriculation')">Immatriculation</th>
+            <th (click)="sort('conducteur')">Conducteur</th>
+            <th (click)="sort('site_destination')">Site Destination</th>
+            <th (click)="sort('type_chargement')">Type Chargement</th>
+            <th (click)="sort('quantite_depart')">Quantité Départ</th>
+            <th (click)="sort('date_depart')">Date Départ</th>
+            <th (click)="sort('heure_depart')">Heure Départ</th>
+            <th (click)="sort('quantite_arrivee')">Quantité Arrivée</th>
+            <th (click)="sort('date_arrivee')">Date Arrivée</th>
+            <th (click)="sort('heure_arrivee')">Heure Arrivée</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let depart of paginatedDeparts">
+            <td>{{ depart.id }}</td>
+            <td>{{ depart.immatriculation }}</td>
+            <td>{{ depart.conducteur }}</td>
+            <td>{{ depart.site_destination }}</td>
+            <td>{{ depart.type_chargement }}</td>
+            <td>{{ depart.quantite_depart }}</td>
+            <td>{{ depart.date_depart }}</td>
+            <td>{{ depart.heure_depart }}</td>
+            <td>{{ depart.quantite_arrivee || "En attente" }}</td>
+            <td>{{ depart.date_arrivee || "-" }}</td>
+            <td>{{ depart.heure_arrivee || "-" }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div *ngIf="!isLoading && filteredDeparts.length === 0">
+    Aucune donnée disponible.
+  </div>
+
+  <div class="pagination" *ngIf="totalPages() > 1">
+    <button
+      *ngFor="let page of [].constructor(totalPages()); let i = index"
+      [class.active]="currentPage === i + 1"
+      (click)="changePage(i + 1)"
+    >
+      {{ i + 1 }}
+    </button>
+  </div>
+</div>

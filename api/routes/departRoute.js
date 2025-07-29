@@ -1,8 +1,17 @@
 const express = require("express");
 const router = express.Router();
-const { addDepart, getAllDeparts } = require("../controllers/departController");
+const departController = require("../controllers/departController");
 
-router.post("/depart", addDepart);
-router.get("/departs", getAllDeparts);
+// Ajouter un départ
+router.post("/departs", departController.addDepart);
+
+// Récupérer tous les départs
+router.get("/departs", departController.getAllDeparts);
+
+router.get("/incoherences", departController.getIncoherences);
+
+// Récupérer un départ par ID
+router.get("/departs/en-cours", departController.getDepartsEnCours);
+router.get("/departs/:id", departController.getDepartById);
 
 module.exports = router;

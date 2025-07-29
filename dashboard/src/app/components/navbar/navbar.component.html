@@ -1,0 +1,21 @@
+<nav>
+  <h1>Tableau de bord</h1>
+  <div class="nav-links">
+    <a
+      routerLink="/"
+      routerLinkActive="active"
+      [routerLinkActiveOptions]="{ exact: true }"
+    >
+      <span class="material-icons">dashboard</span>
+      <small>Total livraisons</small>
+    </a>
+    <a routerLink="/departs" routerLinkActive="active">
+      <span class="material-icons">local_shipping</span>
+      <small>En cours</small>
+    </a>
+    <a routerLink="/incoherences" routerLinkActive="active">
+      <span class="material-icons">error_outline</span>
+      <small>Incohérences</small>
+    </a>
+  </div>
+</nav>

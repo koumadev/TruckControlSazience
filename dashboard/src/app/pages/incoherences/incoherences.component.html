@@ -1,0 +1,40 @@
+<div *ngIf="isLoading" class="loading">Chargement...</div>
+
+<div *ngIf="!isLoading && incoherences.length > 0" class="table-container">
+  <div class="table-wrapper">
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Immatriculation</th>
+          <th>Conducteur</th>
+          <th>Site Destination</th>
+          <th>Type Chargement</th>
+          <th>Quantité Départ</th>
+          <th>Quantité Arrivée</th>
+          <th>Date Départ</th>
+          <th>Heure Départ</th>
+          <th>Date Arrivée</th>
+          <th>Heure Arrivée</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let incoherence of incoherences">
+          <td>{{ incoherence.immatriculation }}</td>
+          <td>{{ incoherence.conducteur }}</td>
+          <td>{{ incoherence.site_destination }}</td>
+          <td>{{ incoherence.type_chargement }}</td>
+          <td>{{ incoherence.quantite_depart }}</td>
+          <td>{{ incoherence.quantite_arrivee }}</td>
+          <td>{{ incoherence.date_depart }}</td>
+          <td>{{ incoherence.heure_depart }}</td>
+          <td>{{ incoherence.date_arrivee }}</td>
+          <td>{{ incoherence.heure_arrivee }}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<div *ngIf="!isLoading && incoherences.length === 0" class="no-data">
+  Aucune incohérence détectée.
+</div>

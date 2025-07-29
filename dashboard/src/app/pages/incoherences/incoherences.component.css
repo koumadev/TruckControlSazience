@@ -1,0 +1,55 @@
+.container {
+  max-width: 900px;
+  margin: 30px auto;
+  padding: 20px;
+  background-color: #f9f9f9;
+  border-radius: 15px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+h2 {
+  text-align: center;
+  margin-bottom: 20px;
+  font-weight: 700;
+  color: #333;
+}
+
+.table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  background-color: #fff;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  border: 1px solid #ddd; /* contour léger */
+}
+
+.table th,
+.table td {
+  border: none; /* supprimer bordures internes */
+  padding: 12px;
+  text-align: center;
+  color: #555;
+  font-weight: 500;
+  font-size: 14px;
+}
+
+.table th {
+  background-color: #ec4400;
+  font-weight: 700;
+  color: #fff;
+}
+
+/* Optionnel : espacement sans ligne visible entre colonnes */
+.table td:not(:last-child),
+.table th:not(:last-child) {
+  border-right: 1px solid transparent;
+}
+
+.no-data {
+  text-align: center;
+  color: #777;
+  font-style: italic;
+  margin-top: 30px;
+}
